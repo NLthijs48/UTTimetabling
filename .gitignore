@@ -1,8 +1,9 @@
 *.xml
 *.xlsx
 *.xls
-
-tabs2sql/*
 *.ini
-/*.sql
-/*.txt
+
+CodeAndData/*.txt
+CodeAndData/*.sql
+CodeAndData/tabs2sql/*.txt
+CodeAndData/tabs2sql/*.sql
