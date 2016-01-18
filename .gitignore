@@ -7,3 +7,12 @@ CodeAndData/*.txt
 CodeAndData/*.sql
 CodeAndData/tabs2sql/*.txt
 CodeAndData/tabs2sql/*.sql
+
+/Paper/*.gz
+/Paper/*.log
+/Paper/*.aux
+/Paper/*.bbl
+/Paper/*.blg
+/Paper/*.out
+/Paper/*.tmp
+/Paper/*.pdf
