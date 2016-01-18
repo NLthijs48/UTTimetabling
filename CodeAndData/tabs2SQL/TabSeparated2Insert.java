@@ -1,3 +1,5 @@
+package me.wiefferink.timetabling;
+
 import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,6 +20,10 @@ public class TabSeparated2Insert {
 		input = new File("S:\\Google Drive\\UT\\Data Science\\Project XML\\Data files\\tabs2sql\\UT_Activities_with_codes_2013-2014.txt");
 		output = new File("S:\\Google Drive\\UT\\Data Science\\Project XML\\Data files\\tabs2sql\\UT_Activities_with_codes_2013-2014.sql");
 		convertUTCourses(input, output, "ut1314_courses");
+		// UT 2013-2014 courses
+		input = new File("S:\\Google Drive\\UT\\Data Science\\Project XML\\Data files\\tabs2sql\\UT_Activities_with_codes_2014-2015.txt");
+		output = new File("S:\\Google Drive\\UT\\Data Science\\Project XML\\Data files\\tabs2sql\\UT_Activities_with_codes_2014-2015.sql");
+		convertUTCourses(input, output, "ut1415_courses");
         // SAX 2013-2015
         input = new File("S:\\Google Drive\\UT\\Data Science\\Project XML\\Data files\\tabs2sql\\All timetabling activities SAX 2013-2015.txt");
         output = new File("S:\\Google Drive\\UT\\Data Science\\Project XML\\Data files\\tabs2sql\\All timetabling activities SAX 2013-2015.sql");
@@ -105,7 +111,7 @@ public class TabSeparated2Insert {
 					}
 				}
 				line = line.replaceAll("\t(#[^\t]*|-)\t(#[^\t]*|-)\t", "\tNONE\t");
-				line = line.replaceAll("([^\t]*\t[^\t]*\t\\d{9})\\t\\d{9}\\t", "$1\t");
+				line = line.replaceAll("([^\t]*\t[^\t]*\t(\\d{9}(A)?|X+|x+|ITC[^\t]*)( )*)\\t(\\d{9}(A)?|X+|x+|ITC[^\t]*)( )*\\t", "$1\t");
 				line = line.replaceAll("\t(#[^\t]*|-)\t", "\t");
 				line = line.replaceAll("                      ", "");
 				line = line.replace("\"", "");
