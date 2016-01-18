@@ -1,4 +1,8 @@
 *.xml
 *.xlsx
+*.xls
 
 tabs2sql/*
+*.ini
+/*.sql
+/*.txt
