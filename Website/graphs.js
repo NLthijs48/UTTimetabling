@@ -1,3 +1,57 @@
+var collegeTime = [];
+collegeTime.push({name: "4 to 6 hours", stack: "default", data: [8573, 8113, 6654, 6384, 9347, 9556, 6241, 4925]});
+collegeTime.push({name: "Less than 4 hours", stack: "default", data: [6491, 7381, 4258, 3757, 7299, 7749, 5231, 5230]});
+collegeTime.push({name: "More as 6 hours", stack: "default", data: [11005, 8006, 8517, 8602, 12815, 8370, 5749, 5587]});
+$(function() {
+	$(".graphs").append("<div class='timetable-chart' id='collegeTime'></div>");
+	$('#collegeTime').highcharts({
+		chart: {
+			type: 'column'
+		},
+		title: {
+			text: 'College time per quarter'
+		},
+		xAxis: {
+			categories: [
+				'2013-2014: Q1',
+				'2013-2014: Q2',
+				'2013-2014: Q3',
+				'2013-2014: Q4',
+				'2014-2015: Q1',
+				'2014-2015: Q2',
+				'2014-2015: Q3',
+				'2014-2015: Q4',
+				'2015-2016: Q1',
+				'2015-2016: Q2',
+				'2015-2016: Q3',
+				'2015-2016: Q4'
+			],
+			crosshair: true
+		},
+		yAxis: {
+			allowDecimals: false,			min: 0,
+			title: {
+				text: 'Category count, each activity of a student set'
+			}
+		},
+		tooltip: {
+			shared: true,
+			useHTML: true
+		},
+		plotOptions: {
+			column: {
+				pointPadding: 0,
+				borderWidth: 0,
+				stacking: 'normal'
+			}
+		},
+		series: collegeTime
+	});
+});
+
+
+
+
 var wastedTime = [];
 wastedTime.push({name: "Teachers: lecture hours", stack: "Teachers", data: [16587, 13278, 13124, 11147, 14782, 13168, 13016, 13030]});
 wastedTime.push({name: "Students: wasted hours", stack: "Students", data: [27592, 19920, 18388, 16129, 33164, 26061, 17258, 14936]});

@@ -20,6 +20,8 @@ public class GraphBuilder {
 
     // Paths
     public static final String DATA_SOURCE = "C:\\Coding\\DataScience\\UTTimetabling\\CodeAndData\\XMLprocessing\\All\\";
+	public static final String DATA_SOURCE_UT_1314 = "C:\\Coding\\DataScience\\UTTimetabling\\CodeAndData\\XMLprocessing\\UT 2013-2014\\";
+	public static final String DATA_SOURCE_UT_1415 = "C:\\Coding\\DataScience\\UTTimetabling\\CodeAndData\\XMLprocessing\\UT 2014-2015\\";
 	public static final String DATA_TARGET = "C:\\Coding\\DataScience\\UTTimetabling\\Website\\";
 
     // XML databases
@@ -37,6 +39,7 @@ public class GraphBuilder {
 	private long endOf1516 = 1460000000000L;
 
 	public GraphBuilder() {
+		Calendar startTime = Calendar.getInstance();
 		quarterDates = new ArrayList<>();
 		try {
 			for (String quarter : quarters) {
@@ -48,6 +51,8 @@ public class GraphBuilder {
 		}
 
 		makeOutput();
+		Calendar endTime = Calendar.getInstance();
+		progress("Finished in "+(((double)(endTime.getTimeInMillis()-startTime.getTimeInMillis()))/1000.0)+" seconds");
 	}
 
 	/**
@@ -65,6 +70,7 @@ public class GraphBuilder {
 
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(output))) {
 			makeCollegeHoursGraph(writer);
+			makeWastedCollegeHoursGraph(writer);
 			makeTeacherCountGraph(writer);
 			makeCourseTypeGraph(writer);
 		} catch (IOException e) {
@@ -74,7 +80,7 @@ public class GraphBuilder {
 	}
 
 	public void makeCourseTypeGraph(BufferedWriter writer) {
-		progress("Creating course type data");
+		progress("Creating graph with college types");
 		Map<Long, Map<String, Long>> result = new TreeMap<>();
 		// Guesses for translations of the internal codes
 		Map<String, String> translate = new HashMap<>();
@@ -124,8 +130,8 @@ public class GraphBuilder {
 		printBarGraph(writer, result, "courseTypes", "Lecture types per quarter", "Activity count", endOf1516, 1);
 	}
 
-	public void makeCollegeHoursGraph(BufferedWriter writer) {
-		progress("Creating course type data");
+	public void makeWastedCollegeHoursGraph(BufferedWriter writer) {
+		progress("Creating graph with given and wasted college hours");
 		Map<Long, Map<String, Long>> result = new TreeMap<>();
 		// Only the first 8
 		for (int i=0; i<8; i++) {
@@ -181,7 +187,7 @@ public class GraphBuilder {
 	}
 
 	public void makeTeacherCountGraph(BufferedWriter writer) {
-		progress("Creating course type data");
+		progress("Creating graph with teacher count");
 		Document document = loadDocument(UT_TEACHER_TIMES);
 		if (document == null) {
 			return;
@@ -210,6 +216,52 @@ public class GraphBuilder {
 			result.put(teachPart.getKey(), map);
 		}
 		printBarGraph(writer, result, "teacherCount", "Teachers per quartile", "Teacher count", endOf1415, 1);
+	}
+
+	public void makeCollegeHoursGraph(BufferedWriter writer) {
+		progress("Creating graph with number of college hours a day");
+		Map<Long, Map<String, Long>> result = new TreeMap<>();
+		Document document = loadDocument(UT_STUDENT_TIMES);
+		if (document == null) {
+			return;
+		}
+		for (long date : quarterDates) {
+			result.put(date, new TreeMap<String, Long>());
+		}
+		NodeList sets = document.getDocumentElement().getElementsByTagName("set");
+		for (int i = 0; i < sets.getLength(); i++) {
+			Node set = sets.item(i);
+			long quarterKey = getQuarterKey(getNodeValue(set.getParentNode(), "dategiven"));
+			if (quarterKey == -1) {
+				error("wrong date: "+ getNodeValue(set.getParentNode(), "dateGiven"));
+				continue;
+			}
+			Map<String, Long> quarter = result.get(quarterKey);
+			if (quarter == null) {
+				quarter = new TreeMap<>();
+				result.put(quarterKey, quarter);
+			}
+			long contactMinutes = asLong(getNodeValue(set, "contactminutes"));
+			if(contactMinutes == -1) {
+				error("  Incorrect contactminutes: "+ getNodeValue(set, "contactminutes"));
+				continue;
+			}
+			String type;
+			if(contactMinutes < 180) { // Below 4 hours
+				type = "Less than 4 hours";
+			} else if(contactMinutes > 270) { // More as 6 hours
+				type = "More as 6 hours";
+			} else {
+				type = "4 to 6 hours";
+			}
+			Long count = quarter.get(type);
+			if (count == null) {
+				count = 0L;
+			}
+			count++;
+			quarter.put(type, count);
+		}
+		printBarGraph(writer, result, "collegeTime", "College time per quarter", "Category count, each activity of a student set", endOf1415, 1);
 	}
 
 	/**
