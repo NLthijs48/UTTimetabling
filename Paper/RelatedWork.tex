@@ -6,3 +6,8 @@ are described: a method for decomposing large real-world timetabling problems an
 initialisation of the population. Secondly, an approach that considers timetabling problems as multicriteria decision
 problems is presented. Thirdly, it discusses a case-based reasoning approach that employs previous experience to solve
 new timetabling problems which basically is similar to our research where we will be analysing past schedules to give indications for improving future schedules. 
+
+Paper \cite{designAndImplementationOfACourseSchedulingSystem} is about the design and implementation of a course scheduling system. They are using Tabu Search to accomplish this, this allows them to define strategies and procedures for the timetabling process. 
+They distinguish hard requirements, like no room can have two lectures at the same time, and soft requirements. The hard requirement always have to be met, the soft requirements have weights and determine the quality of the timetable. The used algorithm first makes an initial timetable, and then optimizes the timetable for the soft requirements. After that the room assignment is improved, which at first has a very low priority. This last phase does not change the time scheduling any more.
+Finally the generated timetables have been compared to the manual solutions of The Business School. It was proves useful for a problem where students could choose any course they want, which manually was being dealt with in a not optimal way.
+The used techniques give a good idea about the timetabling problem and help us understand what KPIs (Key Performance Indicators) are good to have a requirements for timetabling.
