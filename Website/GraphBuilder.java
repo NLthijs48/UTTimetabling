@@ -32,21 +32,22 @@ public class GraphBuilder {
 
 	// Dates and times
 	private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-	private List<String> quarters = Arrays.asList("2013-08-20", "2013-11-09", "2014-01-30", "2014-04-16", "2014-08-20", "2014-11-09", "2015-01-30", "2015-04-16", "2015-08-20", "2015-11-09", "2016-01-30", "2016-04-16");
-	private List<Long> quarterDates;
+	private SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
+	private List<String> quartiles = Arrays.asList("2013-08-20", "2013-11-09", "2014-01-30", "2014-04-16", "2014-08-20", "2014-11-09", "2015-01-30", "2015-04-16", "2015-08-20", "2015-11-09", "2016-01-30", "2016-04-16");
+	private List<Long> quartileDates;
 	private long endOf1314 = 1408485600000L;
 	private long endOf1415 = 1429135200000L;
 	private long endOf1516 = 1460000000000L;
 
 	public GraphBuilder() {
 		Calendar startTime = Calendar.getInstance();
-		quarterDates = new ArrayList<>();
+		quartileDates = new ArrayList<>();
 		try {
-			for (String quarter : quarters) {
-				quarterDates.add(format.parse(quarter).getTime());
+			for (String quartile : quartiles) {
+				quartileDates.add(format.parse(quartile).getTime());
 			}
 		} catch (ParseException e) {
-			error("Could not parse quarter dates:");
+			error("Could not parse quartile dates:");
 			e.printStackTrace(System.err);
 		}
 
@@ -69,9 +70,11 @@ public class GraphBuilder {
 		}
 
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(output))) {
-			makeCollegeHoursGraph(writer);
+			makeStudentCollegeHoursGraph(writer);
+			makeTeacherCollegeHoursGraph(writer);
 			makeWastedCollegeHoursGraph(writer);
-			makeTeacherCountGraph(writer);
+			makeSimpleCountGraphs(writer);
+			makeFridayEveningClassesGraph(writer);
 			makeCourseTypeGraph(writer);
 		} catch (IOException e) {
 			error("Something went wrong while writing the result file: " + output.getAbsolutePath());
@@ -85,49 +88,56 @@ public class GraphBuilder {
 		// Guesses for translations of the internal codes
 		Map<String, String> translate = new HashMap<>();
 		translate.put("COL", "Colstruction");
-		translate.put("WC", "Practical");
+		translate.put("WC", "Tutorial");
 		translate.put("HC", "Lecture");
 		translate.put("TOETS", "Exam");
 		translate.put("BOEK", "Book");
 		translate.put("PRS", "Presentation");
 		translate.put("WG", "Workshop");
-		translate.put("ZMB", "Self Study Supervised");
-		translate.put("ZGB", "Self Study Unsupervised");
+		translate.put("ZMB", "Self Study (supervised)");
+		translate.put("ZGB", "Self Study (unsupervised)");
 		translate.put("ASM", "Academic Research Skills");
-		translate.put("DTOETS", "Diagnostic Exam");
+		translate.put("DTOETS", "Partial Exam");
+		translate.put("PRA", "Practical");
+		translate.put("OVO", "Other");
+		translate.put("ZZA OVERIG", "Other (non-study related)");
+		translate.put("PJB", "Project (supervised)");
+		translate.put("PJO", "Project (unsupervised)");
+		translate.put("RESP", "Question and Answer");
+		// translate.put("ZZA ORATIE", ""); No clue what this is supposed to be
 
 		Document document = loadDocument(UT_COURSES);
 		if(document == null) {
 			return;
 		}
-		for(long date : quarterDates) {
+		for(long date : quartileDates) {
 			result.put(date, new TreeMap<String, Long>());
 		}
 		NodeList activities = document.getDocumentElement().getElementsByTagName("activity");
 		for(int i=0; i<activities.getLength(); i++) {
 			Node activity = activities.item(i);
-			long quarterKey = getQuarterKey(getNodeValue(activity, "dateGiven"));
-			if(quarterKey == -1) {
+			long quartileKey = getQuartileKey(getNodeValue(activity, "dateGiven"));
+			if(quartileKey == -1) {
 				//error("wrong date: "+ getNodeValue(activity, "dateGiven"));
 				continue;
 			}
-			Map<String, Long> quarter = result.get(quarterKey);
-			if(quarter == null) {
-				quarter = new TreeMap<>();
-				result.put(quarterKey, quarter);
+			Map<String, Long> quartile = result.get(quartileKey);
+			if(quartile == null) {
+				quartile = new TreeMap<>();
+				result.put(quartileKey, quartile);
 			}
 			String type = getNodeValue(activity, "type");
-			Long count = quarter.get(type);
+			if (translate.containsKey(type)) {
+				type = translate.get(type);
+			}
+			Long count = quartile.get(type);
 			if(count == null) {
 				count = 0L;
 			}
 			count++;
-			if(translate.containsKey(type)) {
-				type = translate.get(type);
-			}
-			quarter.put(type, count);
+			quartile.put(type, count);
 		}
-		printBarGraph(writer, result, "courseTypes", "Lecture types per quarter", "Activity count", endOf1516, 1);
+		printBarGraph(writer, result, "courseTypes", "Lecture types per quartile", "Activity count", endOf1516, 1);
 	}
 
 	public void makeWastedCollegeHoursGraph(BufferedWriter writer) {
@@ -135,10 +145,11 @@ public class GraphBuilder {
 		Map<Long, Map<String, Long>> result = new TreeMap<>();
 		// Only the first 8
 		for (int i=0; i<8; i++) {
-			result.put(quarterDates.get(i), new TreeMap<String, Long>());
+			result.put(quartileDates.get(i), new TreeMap<String, Long>());
 		}
 		List<String> types = Arrays.asList("teacher", "set");
 		List<String> names = Arrays.asList("Teachers", "Students");
+		List<Long> orders = Arrays.asList(1L, 0L);
 		List<Document> documents = Arrays.asList(loadDocument(UT_TEACHER_TIMES), loadDocument(UT_STUDENT_TIMES));
 		for(int t=0; t<types.size(); t++) {
 			Document document = documents.get(t);
@@ -149,15 +160,15 @@ public class GraphBuilder {
 			NodeList elements = document.getDocumentElement().getElementsByTagName(types.get(t));
 			for (int i = 0; i < elements.getLength(); i++) {
 				Node activity = elements.item(i);
-				long quarterKey = getQuarterKey(getNodeValue(activity.getParentNode(), "dategiven"));
-				if (quarterKey == -1) {
+				long quartileKey = getQuartileKey(getNodeValue(activity.getParentNode(), "dategiven"));
+				if (quartileKey == -1) {
 					error("wrong date: " + getNodeValue(activity.getParentNode(), "dategiven"));
 					continue;
 				}
-				Map<String, Long> quarter = result.get(quarterKey);
-				if (quarter == null) {
-					quarter = new TreeMap<>();
-					result.put(quarterKey, quarter);
+				Map<String, Long> quartile = result.get(quartileKey);
+				if (quartile == null) {
+					quartile = new TreeMap<>();
+					result.put(quartileKey, quartile);
 				}
 				long contactMinutes = asLong(getNodeValue(activity, "contactminutes"));
 				long collegeMinutes = asLong(getNodeValue(activity, "collegeminutes"));
@@ -165,13 +176,13 @@ public class GraphBuilder {
 					error("  incorrect contactminutes: " + getNodeValue(activity, "contactminutes") + " or collegeminutes: " + getNodeValue(activity, "collegeminutes"));
 					continue;
 				}
-				Long count = quarter.get(names.get(t) + ": lecture hours@"+names.get(t));
+				Long count = quartile.get(names.get(t) + ": lecture hours|"+(orders.get(t)*2)+"@"+names.get(t));
 				if (count == null) {
 					count = 0L;
 				}
 				count += contactMinutes;
-				quarter.put(names.get(t) + ": lecture hours@" + names.get(t), count);
-				count = quarter.get(names.get(t) + ": wasted hours@" + names.get(t));
+				quartile.put(names.get(t) + ": lecture hours|"+(orders.get(t)*2)+"@" + names.get(t), count);
+				count = quartile.get(names.get(t) + ": wasted hours|"+(orders.get(t)*2+1)+"@" + names.get(t));
 				if (count == null) {
 					count = 0L;
 				}
@@ -180,14 +191,15 @@ public class GraphBuilder {
 					continue;
 				}
 				count += collegeMinutes - contactMinutes;
-				quarter.put(names.get(t)+": wasted hours@" + names.get(t), count);
+				quartile.put(names.get(t)+": wasted hours|"+(orders.get(t)*2+1)+"@" + names.get(t), count);
 			}
 		}
-		printBarGraph(writer, result, "wastedTime", "Lecture versus wasted hours per quarter (students and teachers)", "Hours", endOf1415, 60);
+		printBarGraph(writer, result, "wastedTime", "Lecture versus wasted hours per quartile (students and teachers)", "Hours", endOf1415, 60);
 	}
 
-	public void makeTeacherCountGraph(BufferedWriter writer) {
-		progress("Creating graph with teacher count");
+	public void makeSimpleCountGraphs(BufferedWriter writer) {
+		progress("Creating graph with simple counts");
+		// Teachers
 		Document document = loadDocument(UT_TEACHER_TIMES);
 		if (document == null) {
 			return;
@@ -196,50 +208,114 @@ public class GraphBuilder {
 		Map<Long, Set<String>> teachers = new TreeMap<>();
 		for (int i = 0; i < activities.getLength(); i++) {
 			Node activity = activities.item(i);
-			long quarterKey = getQuarterKey(getNodeValue(activity.getParentNode(), "dategiven"));
-			if (quarterKey == -1) {
-				//error("wrong date: "+ getNodeValue(activity, "dateGiven"));
+			long quartileKey = getQuartileKey(getNodeValue(activity.getParentNode(), "dategiven"));
+			if (quartileKey == -1) {
+				error("wrong date: "+ getNodeValue(activity.getParentNode(), "dategiven"));
 				continue;
 			}
 			String name = getNodeValue(activity, "name");
-			Set<String> teachSet = teachers.get(quarterKey);
+			Set<String> teachSet = teachers.get(quartileKey);
 			if(teachSet == null) {
 				teachSet = new HashSet<>();
-				teachers.put(quarterKey, teachSet);
+				teachers.put(quartileKey, teachSet);
 			}
 			teachSet.add(name);
 		}
+		// Student sets
+		document = loadDocument(UT_STUDENT_TIMES);
+		if (document == null) {
+			return;
+		}
+		NodeList sets = document.getDocumentElement().getElementsByTagName("set");
+		Map<Long, Set<String>> studentSets = new TreeMap<>();
+		for (int i = 0; i < sets.getLength(); i++) {
+			Node activity = sets.item(i);
+			long quartileKey = getQuartileKey(getNodeValue(activity.getParentNode(), "dategiven"));
+			if (quartileKey == -1) {
+				error("wrong date: "+ getNodeValue(activity.getParentNode(), "dategiven"));
+				continue;
+			}
+			String name = getNodeValue(activity, "name");
+			Set<String> studentSet = studentSets.get(quartileKey);
+			if (studentSet == null) {
+				studentSet = new HashSet<>();
+				studentSets.put(quartileKey, studentSet);
+			}
+			studentSet.add(name);
+		}
+		// Activities
+		document = loadDocument(UT_COURSES);
+		if (document == null) {
+			return;
+		}
+		NodeList dataOne = document.getDocumentElement().getElementsByTagName("activity");
+		Map<Long, Set<String>> activitiesCount = new TreeMap<>();
+		for (int i = 0; i < dataOne.getLength(); i++) {
+			Node activity = dataOne.item(i);
+			long quartileKey = getQuartileKey(getNodeValue(activity, "dateGiven"));
+			if (quartileKey == -1) {
+				//error("wrong date: " + getNodeValue(activity, "dateGiven"));
+				continue;
+			}
+			String name = getNodeValue(activity, "code");
+			Set<String> courses = activitiesCount.get(quartileKey);
+			if (courses == null) {
+				courses = new HashSet<>();
+				activitiesCount.put(quartileKey, courses);
+			}
+			courses.add(name);
+		}
+		// Get results
 		Map<Long, Map<String, Long>> result = new TreeMap<>();
 		for(Map.Entry<Long, Set<String>> teachPart : teachers.entrySet()) {
-			Map<String, Long> map = new TreeMap<>();
-			map.put("Teacher count", (long)teachPart.getValue().size());
+			Map<String, Long> map = result.get(teachPart.getKey());
+			if (map == null) {
+				map = new TreeMap<>();
+			}
+			map.put("Teacher count@Teachers", (long)teachPart.getValue().size());
 			result.put(teachPart.getKey(), map);
 		}
-		printBarGraph(writer, result, "teacherCount", "Teachers per quartile", "Teacher count", endOf1415, 1);
+		for (Map.Entry<Long, Set<String>> studentSetPart : studentSets.entrySet()) {
+			Map<String, Long> map = result.get(studentSetPart.getKey());
+			if(map == null) {
+				map = new TreeMap<>();
+			}
+			map.put("Student set count@Students", (long) studentSetPart.getValue().size());
+			result.put(studentSetPart.getKey(), map);
+		}
+		for (Map.Entry<Long, Set<String>> courseSet : activitiesCount.entrySet()) {
+			Map<String, Long> map = result.get(courseSet.getKey());
+			if (map == null) {
+				map = new TreeMap<>();
+			}
+			map.put("Course count@Courses", (long) courseSet.getValue().size());
+			result.put(courseSet.getKey(), map);
+		}
+		printBarGraph(writer, result, "simpleCounts", "Teachers, studentsets and courses per quartile", "Count", endOf1415, 1);
 	}
 
-	public void makeCollegeHoursGraph(BufferedWriter writer) {
-		progress("Creating graph with number of college hours a day");
+	public void makeStudentCollegeHoursGraph(BufferedWriter writer) {
+		progress("Creating graph with number of student college hours a day");
 		Map<Long, Map<String, Long>> result = new TreeMap<>();
 		Document document = loadDocument(UT_STUDENT_TIMES);
 		if (document == null) {
 			return;
 		}
-		for (long date : quarterDates) {
+		for (long date : quartileDates) {
 			result.put(date, new TreeMap<String, Long>());
 		}
 		NodeList sets = document.getDocumentElement().getElementsByTagName("set");
 		for (int i = 0; i < sets.getLength(); i++) {
 			Node set = sets.item(i);
-			long quarterKey = getQuarterKey(getNodeValue(set.getParentNode(), "dategiven"));
-			if (quarterKey == -1) {
-				error("wrong date: "+ getNodeValue(set.getParentNode(), "dateGiven"));
+			long quartileKey = getQuartileKey(getNodeValue(set.getParentNode(), "dategiven"));
+			if (quartileKey == -1) {
+				error("wrong date: "+ getNodeValue(set.getParentNode(), "dategiven"));
 				continue;
 			}
-			Map<String, Long> quarter = result.get(quarterKey);
-			if (quarter == null) {
-				quarter = new TreeMap<>();
-				result.put(quarterKey, quarter);
+			Map<String, Long> quartile = result.get(quartileKey);
+			if (quartile == null) {
+				quartile = new TreeMap<>();
+				result.put(quartileKey, quartile);
 			}
 			long contactMinutes = asLong(getNodeValue(set, "contactminutes"));
 			if(contactMinutes == -1) {
@@ -247,21 +323,121 @@ public class GraphBuilder {
 				continue;
 			}
 			String type;
-			if(contactMinutes < 180) { // Below 4 hours
-				type = "Less than 4 hours";
-			} else if(contactMinutes > 270) { // More as 6 hours
-				type = "More as 6 hours";
+			if(contactMinutes < 210) {
+				type = "<4 college hours|0";
+			} else if(contactMinutes > 420) {
+				type = ">8 college hours|3";
+			} else if (contactMinutes > 315) {
+				type = "7-8 college hours|2";
 			} else {
-				type = "4 to 6 hours";
+				type = "4-6 college hours|1";
 			}
-			Long count = quarter.get(type);
+			Long count = quartile.get(type);
 			if (count == null) {
 				count = 0L;
 			}
 			count++;
-			quarter.put(type, count);
+			quartile.put(type, count);
 		}
-		printBarGraph(writer, result, "collegeTime", "College time per quarter", "Category count, each activity of a student set", endOf1415, 1);
+		printBarGraph(writer, result, "studentCollegeHours", "College hours per quartile", "Category count, each activity of a student set", endOf1415, 1);
+	}
+
+	public void makeTeacherCollegeHoursGraph(BufferedWriter writer) {
+		progress("Creating graph with number of teacher hours a day");
+		Map<Long, Map<String, Long>> result = new TreeMap<>();
+		Document document = loadDocument(UT_TEACHER_TIMES);
+		if (document == null) {
+			return;
+		}
+		for (long date : quartileDates) {
+			result.put(date, new TreeMap<String, Long>());
+		}
+		NodeList sets = document.getDocumentElement().getElementsByTagName("teacher");
+		for (int i = 0; i < sets.getLength(); i++) {
+			Node set = sets.item(i);
+			long quartileKey = getQuartileKey(getNodeValue(set.getParentNode(), "dategiven"));
+			if (quartileKey == -1) {
+				error("wrong date: " + getNodeValue(set.getParentNode(), "dategiven"));
+				continue;
+			}
+			Map<String, Long> quartile = result.get(quartileKey);
+			if (quartile == null) {
+				quartile = new TreeMap<>();
+				result.put(quartileKey, quartile);
+			}
+			long contactMinutes = asLong(getNodeValue(set, "contactminutes"));
+			if (contactMinutes == -1) {
+				error("  Incorrect contactminutes: " + getNodeValue(set, "contactminutes"));
+				continue;
+			}
+			String type;
+			if (contactMinutes < 210) {
+				type = "<4 college hours|0";
+			} else if (contactMinutes > 420) {
+				type = ">8 college hours|3";
+			} else if (contactMinutes > 315) {
+				type = "7-8 college hours|2";
+			} else {
+				type = "4-6 college hours|1";
+			}
+			Long count = quartile.get(type);
+			if (count == null) {
+				count = 0L;
+			}
+			count++;
+			quartile.put(type, count);
+		}
+		printBarGraph(writer, result, "teacherCollegeHours", "Teacher hours per quartile", "Category count, each activity of a teacher", endOf1415, 1);
+	}
+
+	public void makeFridayEveningClassesGraph(BufferedWriter writer) {
+		progress("Creating graph with number of Friday evening classes");
+		Map<Long, Map<String, Long>> result = new TreeMap<>();
+		Document document = loadDocument(UT_ACTIVITIES);
+		if (document == null) {
+			return;
+		}
+		for (long date : quartileDates) {
+			result.put(date, new TreeMap<String, Long>());
+		}
+		NodeList activities = document.getDocumentElement().getElementsByTagName("activity");
+		for (int i = 0; i < activities.getLength(); i++) {
+			Node set = activities.item(i);
+			if(!"Friday".equals(getNodeValue(set.getParentNode(), "daygiven"))) {
+				continue;
+			}
+			String endTime = getNodeValue(set, "endtime");
+			Calendar date = Calendar.getInstance();
+			try {
+				Date d = timeFormat.parse(endTime);
+				date.setTime(d);
+			} catch (ParseException e) {
+				error("  Incorrect time: "+endTime);
+				continue;
+			}
+			// Filter evening classes (later as 18:30)
+			if(date.get(Calendar.HOUR_OF_DAY) < 17 || (date.get(Calendar.HOUR_OF_DAY) == 17 && date.get(Calendar.MINUTE) <= 30)) {
+				continue;
+			}
+
+			long quartileKey = getQuartileKey(getNodeValue(set.getParentNode(), "dategiven"));
+			if (quartileKey == -1) {
+				error("wrong date: " + getNodeValue(set.getParentNode(), "dateGiven"));
+				continue;
+			}
+			Map<String, Long> quartile = result.get(quartileKey);
+			if (quartile == null) {
+				quartile = new TreeMap<>();
+				result.put(quartileKey, quartile);
+			}
+			Long count = quartile.get("Friday evening classes");
+			if (count == null) {
+				count = 0L;
+			}
+			count++;
+			quartile.put("Friday evening classes", count);
+		}
+		printBarGraph(writer, result, "collegeTime", "Fiday evening classes per quartile", "Count of Friday evening classes", endOf1415, 1);
 	}
 
 	/**
@@ -285,12 +461,17 @@ public class GraphBuilder {
 			// Print data serie for each bar type
 			for(String compoundBarType : barTypes) {
 				String[] parts = compoundBarType.split("@");
-				String barType = parts[0];
 				String stack = "default";
+				String[] parts2 = parts[0].split("\\|");
+				long legendIndex = 0;
+				String barType = parts2[0];
+				if(parts2.length > 1) {
+					legendIndex = asLong(parts2[1]);
+				}
 				if(parts.length >= 2) {
 					stack = parts[1];
 				}
-				writer.write(type + ".push({name: \"" + barType + "\", stack: \""+stack+"\", data: [");
+				writer.write(type + ".push({name: \"" + barType + "\", stack: \""+stack+"\", legendIndex: \""+legendIndex+"\", index: \""+legendIndex+"\", data: [");
 				boolean first = true;
 				for (Map.Entry<Long, Map<String, Long>> timeData : data.entrySet()) {
 					if(timeData.getKey() > until) {
@@ -384,7 +565,7 @@ public class GraphBuilder {
 		return result;
 	}
 
-	public long getQuarterKey(String date) {
+	public long getQuartileKey(String date) {
 		long result = 0;
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(0);
@@ -395,11 +576,11 @@ public class GraphBuilder {
 			return -1;
 		}
 
-		for (int i=0; i<quarterDates.size()-1; i++) {
-			if(calendar.getTimeInMillis() >= quarterDates.get(i)
-					&& calendar.getTimeInMillis() < quarterDates.get(i+1)) {
-				//progress("quarter "+i);
-				return quarterDates.get(i);
+		for (int i=0; i<quartileDates.size()-1; i++) {
+			if(calendar.getTimeInMillis() >= quartileDates.get(i)
+					&& calendar.getTimeInMillis() < quartileDates.get(i+1)) {
+				//progress("quartile "+i);
+				return quartileDates.get(i);
 			}
 		}
 		return -1;
