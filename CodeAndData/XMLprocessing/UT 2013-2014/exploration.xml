@@ -1,0 +1,28 @@
+<exploration>
+  <wastedminutes>
+    <teacher>
+      <count>789</count>
+      <wasteminutes>284265</wasteminutes>
+      <averagewasteminutes>360.2851711026616</averagewasteminutes>
+      <contactminutes>3.24927E6</contactminutes>
+      <maxwaste>
+        <teacher>
+          <name>WW Wits</name>
+          <wastedminutes>10320</wastedminutes>
+        </teacher>
+      </maxwaste>
+    </teacher>
+    <student>
+      <count>2292</count>
+      <wasteminutes>3.7368E6</wasteminutes>
+      <averagewasteminutes>1630.3664921465968</averagewasteminutes>
+      <contactminutes>2.328546E7</contactminutes>
+      <maxwaste>
+        <set>
+          <name>ATLAS B1 SEM1 A</name>
+          <wastedminutes>10320</wastedminutes>
+        </set>
+      </maxwaste>
+    </student>
+  </wastedminutes>
+</exploration>

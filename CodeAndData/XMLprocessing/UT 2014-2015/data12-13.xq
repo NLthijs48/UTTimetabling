@@ -1,5 +1,5 @@
 <data>
-{for $day in doc("data2.xml")//day
+{for $day in doc("data12.xml")//day
 return <day>{
   $day/dategiven}{$day/daygiven}{
   for $name in distinct-values($day//name)

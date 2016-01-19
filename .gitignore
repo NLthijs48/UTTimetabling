@@ -1,4 +1,3 @@
-*.xml
 *.xlsx
 *.xls
 *.ini
@@ -7,6 +6,8 @@ CodeAndData/*.txt
 CodeAndData/*.sql
 CodeAndData/tabs2sql/*.txt
 CodeAndData/tabs2sql/*.sql
+CodeAndData/*/*/data*.xml
+CodeAndData/*/*/courses*.xml
 
 /Paper/*.gz
 /Paper/*.log

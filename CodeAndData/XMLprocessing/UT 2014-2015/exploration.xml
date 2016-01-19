@@ -1,0 +1,28 @@
+<exploration>
+  <wastedminutes>
+    <teacher>
+      <count>875</count>
+      <wasteminutes>349995</wasteminutes>
+      <averagewasteminutes>399.9942857142857</averagewasteminutes>
+      <contactminutes>3.242415E6</contactminutes>
+      <maxwaste>
+        <teacher>
+          <name>G Meinsma</name>
+          <wastedminutes>7860</wastedminutes>
+        </teacher>
+      </maxwaste>
+    </teacher>
+    <student>
+      <count>2324</count>
+      <wasteminutes>4.33353E6</wasteminutes>
+      <averagewasteminutes>1864.6858864027538</averagewasteminutes>
+      <contactminutes>2.2366185E7</contactminutes>
+      <maxwaste>
+        <set>
+          <name>ITC AES-ERE 01</name>
+          <wastedminutes>8850</wastedminutes>
+        </set>
+      </maxwaste>
+    </student>
+  </wastedminutes>
+</exploration>
