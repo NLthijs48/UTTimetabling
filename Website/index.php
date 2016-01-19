@@ -22,6 +22,13 @@
 				color: #666;
 				padding: 0 15px 0 15px;
 			}
+			.credits {
+				text-align: center;
+				color: #666;
+				font-weight: bold;
+				font-size: 14px;
+				padding-bottom: 10px;
+			}
 		</style>
 	</head>
 	<body>
@@ -38,7 +45,7 @@
 				</div>
 				<div class="collapse navbar-collapse">
 					<ul class="nav navbar-nav">
-						<li class="active"><a href="#">Game stats</a></li>
+						<li class="active"><a href="#">Timetabling stats</a></li>
 					</ul>
 					<ul class="nav navbar-nav">
 						<li><a href="https://github.com/NLthijs48/UTTimetabling">Code on Github</a></li>
@@ -49,13 +56,14 @@
 
 		<div class="explanation">
 			<p>
-				TODO
+				For the XMLDB topic of the Data Science course at the University of Twente we have investigated the timetabling data of the years 2013-2014 and 2014-2015. The goal was to check if the scheduled activities meet certain guidelines (Key Performance Indicators) and to explore the data for interesting patterns.
 			</p>
 		</div>
 
 		<div class="graphs">
 
 		</div>
+		<div class='credits'>Made by Thijs Wiefferink and Patrick van Looy</div>
 
 		<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
 		<script src="https://code.highcharts.com/stock/highstock.js"></script>
