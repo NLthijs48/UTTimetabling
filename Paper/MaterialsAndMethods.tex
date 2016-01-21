@@ -1,2 +1,22 @@
 \section{Materials and Methods}
-Materials and methods
+\subsection{Given data}
+For this project data about the time tables of the University of Twente is used, this data is provided by the University itself. The data is stored across a couple of \code{.xlsx} files, which can be used with \emph{Microsoft Excel}. There are separate files for the year 2013-2014 and the year 2014-2015. The following files have been provided:
+
+\begin{itemize}
+	\item \textbf{Activities:} Rows with the course name, lecture type, date (day, start/end time), teacher, group size, student sets, room
+	\item \textbf{Course codes:} Rows with the activity name, description, course code, lecture type, date (day, start/end time) and group size
+	\item \textbf{Teachers:} Rows with course code, course name, teacher code and teacher name
+	\item \textbf{Usage counts:} Per activity of a certain day of the year a count of the number of people actually in the room.
+	\item\textbf{Rooms:} Information about the available equipment in certain rooms
+\end{itemize}
+
+The activities and course codes files are actually used for the research in an automated way, the other files are only used to provide context.
+
+\subsection{Excel to SQL}
+To work with the provided data it has to be converted to a format that is easily to loop through or query in. The first step of the conversion is to get the data in a SQL database. The Excel file has been saved as tab-separated file through Excel itself. Then a Java program has been written to transform the tab-separated file into a SQL file that has insert statements for importing it into a database. This program first prints a \code{CREATE TABLE} statement to the output, which creates the table in the database with the correct columns. After this the program loops through the lines in the tab-separated file, performs a couple regular expressions on the line and adds it as an \code{INSERT} statement to the output.
+
+The activities data conversion to SQL has just a couple steps, first filter forbidden characters like \code{'} and \code{"}, then replace all tabs by comma-space and as list add the start and end of the \code{INSERT} statement.
+
+The courses data required more work, the main reason for this was that the data has a course code and a module code column. Normally only one of these should be filled in, the course code if it is an old course, the module code if it is a course in the new TOM model. This was however not true in practise, some activities had both and others had neither. Therefore extra corrections on the data have been made with regular expressions in addition to the corrections also made for the activities.
+
+After the script converted the activities and courses data for both years to SQL scripts these have been imported in a PostgreSQL database. This database has been chosen because it is capable of generating XML with SQL queries.
