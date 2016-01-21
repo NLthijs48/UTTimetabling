@@ -7,6 +7,7 @@ To mention:
 	\item splitting on student sets and teachers changes statistics
 	\item teachers are sometimes split by space, we only detect \code{;}
 	\item wasted hours: breaks included
+	\item rooms used, weird numbers
 \end{itemize}
 
 Although results seem quite accurate with such large and inconsistent datasets, results are always skewed. This is certainly not different in our case. The datasets show many inconsistencies which already made the first step of translating the Excel data into an insert query for the database a very complex job. Firstly, many filters needed to be applied to obtain a working insert query. It is possible that some of these filters have altered data in a few cases, however this is quite impossible to validate.
@@ -16,17 +17,27 @@ We were given a set of KPIs and questions to perform analyses with on our datase
 \begin{itemize}
 	\item We defined a contact hour or college hour as 45 minutes (rather than a clock hour)
 	\item We assumed that student sets and teacher were separated with a semicolon
-	\item Evening classes are classes after the 9th (college) hour (after 17:30 or 5.30 PM)
-	\item Interpretation of KPI 4 in table
-	\item\textbf{Rooms:} Information about the available equipment in certain rooms
+	\item Interpretation of KPI 4 in table \ref{table:kpiAndExploration} on page \pageref{table:kpiAndExploration}: End of last college hour minus start of first college hour is less than 495 minutes (11 college hours).
+	\item Interpretation of KPI 6 in table \ref{table:kpiAndExploration} on page \pageref{table:kpiAndExploration}: Evening classes are classes after the 9\textsuperscript{th} (college) hour (after 17:30 or 5.30 PM)
+	\item For KPI 9 in table \ref{table:kpiAndExploration} on page \pageref{table:kpiAndExploration}: We defined the total minutes of educational hours as;
+	\begin{itemize} 
+	\item minutes a day: $9*45=405$ minutes
+	\item five days in a week: $5*405=2025$ minutes
+	\item 4 quartiles counting ten weeks each (eight weeks of regular education and two exam weeks): $4*10*2025=81000$ minutes
+	\end{itemize}
 \end{itemize}
 
 \subsection{Corrections}
-We were given a set of KPIs and questions to perform analyses with on our datasets. However, it was not obvious in all cases how to interpret these. Therefore, we had to make certain assumptions:
+In order to come up with more or less accurate results we had to perform multiple corrections, namely:
 \begin{itemize}
-	\item We defined a contact hour or college hour as 45 minutes (rather than a clock hour)
-	\item We assumed that student sets and teacher were separated with a semicolon
-	\item 
-	\item \textbf{Usage counts:} Per activity of a certain day of the year a count of the number of people actually in the room.
-	\item\textbf{Rooms:} Information about the available equipment in certain rooms
+	\item With teachers we discovered that it could occur in some circumstances that a teacher actually had more contact minutes a day then there was between the start of his/hers first activity and last activity. This means that the teacher has overlapping activities in the dataset. In order to correct this, when we observed this behaviour we set it to the actual time between the first and the last activity.
+	\item There were many cases in which no date was given. The only possible option for us was to neglect this entry in our results.
+	\item Also, in many cases the start and end time were missing, so these entries were not accounted for either.
+\end{itemize}
+
+\subsection{Inconsistencies}
+\begin{itemize}
+	\item It can occur that a student is actually present in multiple student sets. Therefore a student set does not represent an individual student.
+	\item It came to our eye that there were some cases in which teachers were separated by a space; this could not be accounted for in the results since it is impossible to build an accurate filter for that.
+	\item In the dataset used for analysing the different lecture types, data from 2014 was missing.
 \end{itemize}
