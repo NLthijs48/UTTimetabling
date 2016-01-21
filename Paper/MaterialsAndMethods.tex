@@ -20,3 +20,34 @@ The activities data conversion to SQL has just a couple steps, first filter forb
 The courses data required more work, the main reason for this was that the data has a course code and a module code column. Normally only one of these should be filled in, the course code if it is an old course, the module code if it is a course in the new TOM model. This was however not true in practise, some activities had both and others had neither. Therefore extra corrections on the data have been made with regular expressions in addition to the corrections also made for the activities.
 
 After the script converted the activities and courses data for both years to SQL scripts these have been imported in a PostgreSQL database. This database has been chosen because it is capable of generating XML with SQL queries.
+
+\subsection{SQL to XML}
+From the SQL database the data has been exported as a couple XML databases. For both years a database with the activities and a database with the courses has been exported. The SQL query for generating the activities XML database can be found in Listing \ref{sql2xml}. This database has been used for further querying with XQuery, which is described in Section \ref{xquery}. In order to get a valid XML database a root element had to be added to the output of the SQL query.
+
+\begin{lstlisting}[caption=SQL to XML conversion, label=sql2xml, float=htpb, language=sql]
+select
+	xmlelement(name "day",
+		xmlforest(days.dateGiven, days.daygiven),
+		(select
+			xmlagg(xmlelement(name "activity",
+				xmlforest(t.starttime, t.endtime, t.studentsets, t.room, t.coursename, t.teacher)
+			))
+		from
+			ut1314 as t
+		where
+			days.dateGiven = t.dateGiven
+		)
+	)
+from
+	(select distinct
+		t.dateGiven, t.daygiven
+	from
+		ut1314 as t
+	order by
+		t.dateGiven
+) as days;
+\end{lstlisting}
+
+As shown in the query of Listing \ref{sql2xml}, the data has been organized by day. So this means the XML database contains an element for each day, and this day element contains \code{<activity>} elements. Activity elements contain the course name/code, teacher, location, lecture type, etcetera. This organisation per day helped with the questions that would need to be answered. We for example investigated the number of wasted hours per day, which is defined as hours between lectures. So in this case having all activities of a day together is convenient. Some other questions did not rely on the day grouping, but also did not suffer because of this decision. More about this is explained in Section \ref{xquery}. 
+
+\subsection{XQuery: gathering statistics} \label{xquery}
