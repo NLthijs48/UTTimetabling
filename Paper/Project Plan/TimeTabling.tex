@@ -1,0 +1,92 @@
+\documentclass{sig-alternate-br} % Use the layout as requested by the university
+
+%===== Used packages =====
+\usepackage[utf8]{inputenc}	% Use UTF8 characters
+\usepackage{url}			% Proper url in the references section
+\usepackage{flushend}		% Balance the columns on the last page
+\usepackage{relsize}		% Provide \mathlarger to get formula's to the correct size
+\usepackage{enumitem}		% Numbered items
+\usepackage{placeins}		% Used for \FloatBarrier
+\usepackage{float}
+\usepackage{verbatim}		% Used for \begin{comment} \end{comment}
+\setlist{itemsep=0pt, topsep=2pt}
+\usepackage{hyperref}		% Internal references can be clicked
+\pagenumbering{arabic} 	% Page numbering
+\usepackage{booktabs} % better tables
+% Setup captions styling
+\usepackage{caption}
+\captionsetup[lstlisting]{format=plain, singlelinecheck=false, margin=0pt, font={bf,footnotesize}, justification=centering}
+\captionsetup[figure]{format=plain, singlelinecheck=false, margin=0pt, font={bf,footnotesize}, justification=centering, aboveskip=3pt}
+
+%===== Code snippet styling =====
+\newcommand{\code}[1]{\texttt{\small \color{inline}#1}} % \code command for inline snippets
+\usepackage{listings}		% Code snippets
+\usepackage{color}			% Code highlighting colors
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{inline}{rgb}{0,0,0.5}
+\definecolor{gray}{gray}{0.2}
+\definecolor{codeText}{rgb}{0.1,0.1,0.1}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+  framerule=0.2pt,
+  language=Java,
+  aboveskip=-2mm,
+  belowskip=0mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily\color{codeText}},
+  numbers=left,
+  numbersep=4pt,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4,
+  morekeywords={data, day, dateGiven, daygiven, activity, startTime, endTime, studentsets, room, coursename, teacher}
+}
+\lstset{language=C, escapechar=$} % Set default language to C
+% Set titles for listing references
+%\renewcommand\lstlistingname{Algorithm}
+%\renewcommand\lstlistlistingname{Algorithms}
+%\def\lstlistingautorefname{Algorithm}
+% Enable using math mode in code
+\lstset{
+  mathescape,         
+  literate={->}{$\rightarrow$}{2}
+           {ε}{$\varepsilon$}{1}
+}
+
+\begin{document}
+
+\title{Data Science: Timetabling University of Twente}
+
+\numberofauthors{2}
+\author{
+\alignauthor Thijs Wiefferink\\
+       \affaddr{University of Twente}\\
+       \affaddr{P.O. Box 217, 7500AE Enschede}\\
+       \affaddr{The Netherlands}\\
+       \email{t.w.wiefferink@student.utwente.nl}
+\alignauthor Patrick van Looy\\
+       \affaddr{University of Twente}\\
+       \affaddr{P.O. Box 217, 7500AE Enschede}\\
+       \affaddr{The Netherlands}\\
+       \email{p.vanlooy@student.utwente.nl}
+}
+\date{\today}
+
+
+\maketitle
+
+\keywords{Data Science, Timetable, Scheduling, XML, Databases, XQuery, XPath.}
+
+\input{Introduction.tex}
+\input{RelatedWork.tex}
+\input{Plan.tex}
+
+\bibliographystyle{ieeetr}
+\bibliography{TimeTabling}
+
+\end{document}

@@ -9,11 +9,11 @@ CodeAndData/tabs2sql/*.sql
 CodeAndData/*/*/data*.xml
 CodeAndData/*/*/courses*.xml
 
-/Paper/*.gz
-/Paper/*.log
-/Paper/*.aux
-/Paper/*.bbl
-/Paper/*.blg
-/Paper/*.out
-/Paper/*.tmp
-/Paper/*.pdf
+*.gz
+*.log
+*.aux
+*.bbl
+*.blg
+*.out
+*.tmp
+*.pdf
