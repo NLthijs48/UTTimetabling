@@ -323,14 +323,28 @@ public class GraphBuilder {
 				continue;
 			}
 			String type;
-			if(contactMinutes < 210) {
-				type = "<4 college hours|0";
-			} else if(contactMinutes > 420) {
-				type = ">8 college hours|3";
-			} else if (contactMinutes > 315) {
-				type = "7-8 college hours|2";
+			if (contactMinutes < 75) {
+				type = "1 college hour or less|0";
+			} else if (contactMinutes < 130) {
+				type = "2 college hours|1";
+			} else if (contactMinutes < 180) {
+				type = "3 college hours|2";
+			} else if (contactMinutes < 230) {
+				type = "4 college hours|3";
+			} else if (contactMinutes < 275) {
+				type = "5 college hours|4";
+			} else if (contactMinutes < 330) {
+				type = "6 college hours|5";
+			} else if (contactMinutes < 380) {
+				type = "7 college hours|6";
+			} else if (contactMinutes < 435) {
+				type = "8 college hours|7";
+			} else if (contactMinutes < 485) {
+				type = "9 college hours|8";
+			} else if (contactMinutes < 540) {
+				type = "10 college hours|9";
 			} else {
-				type = "4-6 college hours|1";
+				type = "11 or more college hours|10";
 			}
 			Long count = quartile.get(type);
 			if (count == null) {
@@ -371,14 +385,28 @@ public class GraphBuilder {
 				continue;
 			}
 			String type;
-			if (contactMinutes < 210) {
-				type = "<4 college hours|0";
-			} else if (contactMinutes > 420) {
-				type = ">8 college hours|3";
-			} else if (contactMinutes > 315) {
-				type = "7-8 college hours|2";
+			if(contactMinutes < 75) {
+				type = "1 college hour or less|0";
+			} else if(contactMinutes < 130) {
+				type = "2 college hours|1";
+			} else if (contactMinutes < 180) {
+				type = "3 college hours|2";
+			} else if (contactMinutes < 230) {
+				type = "4 college hours|3";
+			} else if (contactMinutes < 275) {
+				type = "5 college hours|4";
+			} else if (contactMinutes < 330) {
+				type = "6 college hours|5";
+			} else if (contactMinutes < 380) {
+				type = "7 college hours|6";
+			} else if (contactMinutes < 435) {
+				type = "8 college hours|7";
+			} else if (contactMinutes < 485) {
+				type = "9 college hours|8";
+			} else if (contactMinutes < 540) {
+				type = "10 college hours|9";
 			} else {
-				type = "4-6 college hours|1";
+				type = "11 or more college hours|10";
 			}
 			Long count = quartile.get(type);
 			if (count == null) {

@@ -1,8 +1,15 @@
 var studentCollegeHours = [];
-studentCollegeHours.push({name: "4-6 college hours", stack: "default", legendIndex: "1", index: "1", data: [10677, 9879, 8232, 7340, 6309, 6882, 4458, 3464]});
-studentCollegeHours.push({name: "7-8 college hours", stack: "default", legendIndex: "2", index: "2", data: [3891, 2654, 3063, 3216, 8153, 4440, 3087, 3175]});
-studentCollegeHours.push({name: "<4 college hours", stack: "default", legendIndex: "0", index: "0", data: [6903, 7851, 4495, 4193, 11794, 11551, 7945, 7614]});
-studentCollegeHours.push({name: ">8 college hours", stack: "default", legendIndex: "3", index: "3", data: [4598, 3116, 3639, 3994, 3205, 2802, 1731, 1489]});
+studentCollegeHours.push({name: "10 college hours", stack: "default", legendIndex: "9", index: "9", data: [1496, 787, 963, 1464, 2381, 2582, 1432, 1140]});
+studentCollegeHours.push({name: "9 college hours", stack: "default", legendIndex: "8", index: "8", data: [3086, 2304, 2661, 2501, 824, 109, 298, 345]});
+studentCollegeHours.push({name: "2 college hours", stack: "default", legendIndex: "1", index: "1", data: [5721, 6475, 3671, 3235, 5714, 5407, 3453, 3310]});
+studentCollegeHours.push({name: "6 college hours", stack: "default", legendIndex: "5", index: "5", data: [2516, 2236, 1815, 1392, 1457, 1128, 931, 923]});
+studentCollegeHours.push({name: "3 college hours", stack: "default", legendIndex: "2", index: "2", data: [503, 688, 504, 282, 1315, 1977, 1550, 1736]});
+studentCollegeHours.push({name: "5 college hours", stack: "default", legendIndex: "4", index: "4", data: [678, 322, 441, 375, 2642, 2952, 2001, 1235]});
+studentCollegeHours.push({name: "7 college hours", stack: "default", legendIndex: "6", index: "6", data: [1707, 1240, 1248, 1613, 3707, 1487, 1359, 1195]});
+studentCollegeHours.push({name: "1 college hour or less", stack: "default", legendIndex: "0", index: "0", data: [267, 218, 83, 240, 270, 365, 228, 184]});
+studentCollegeHours.push({name: "11 or more college hours", stack: "default", legendIndex: "10", index: "10", data: [16, 25, 15, 29, 0, 111, 1, 4]});
+studentCollegeHours.push({name: "4 college hours", stack: "default", legendIndex: "3", index: "3", data: [7895, 7791, 6213, 6009, 6705, 6604, 4240, 3690]});
+studentCollegeHours.push({name: "8 college hours", stack: "default", legendIndex: "7", index: "7", data: [2184, 1414, 1815, 1603, 4446, 2953, 1728, 1980]});
 $(function() {
 	$(".graphs").append("<div class='timetable-chart' id='studentCollegeHours'></div>");
 	$('#studentCollegeHours').highcharts({
@@ -54,10 +61,17 @@ $(function() {
 
 
 var teacherCollegeHours = [];
-teacherCollegeHours.push({name: "4-6 college hours", stack: "default", legendIndex: "1", index: "1", data: [1828, 1426, 1460, 1143, 1149, 1002, 968, 727]});
-teacherCollegeHours.push({name: "7-8 college hours", stack: "default", legendIndex: "2", index: "2", data: [205, 146, 105, 86, 242, 177, 218, 406]});
-teacherCollegeHours.push({name: "<4 college hours", stack: "default", legendIndex: "0", index: "0", data: [3611, 3326, 2937, 2255, 4178, 3788, 3420, 3119]});
-teacherCollegeHours.push({name: ">8 college hours", stack: "default", legendIndex: "3", index: "3", data: [272, 145, 237, 286, 174, 173, 185, 222]});
+teacherCollegeHours.push({name: "10 college hours", stack: "default", legendIndex: "9", index: "9", data: [103, 54, 134, 197, 126, 150, 160, 195]});
+teacherCollegeHours.push({name: "9 college hours", stack: "default", legendIndex: "8", index: "8", data: [169, 91, 103, 89, 48, 20, 25, 25]});
+teacherCollegeHours.push({name: "2 college hours", stack: "default", legendIndex: "1", index: "1", data: [3382, 3067, 2705, 2064, 3188, 2788, 2419, 2204]});
+teacherCollegeHours.push({name: "6 college hours", stack: "default", legendIndex: "5", index: "5", data: [100, 81, 62, 35, 112, 91, 102, 85]});
+teacherCollegeHours.push({name: "3 college hours", stack: "default", legendIndex: "2", index: "2", data: [117, 139, 80, 81, 270, 425, 305, 424]});
+teacherCollegeHours.push({name: "5 college hours", stack: "default", legendIndex: "4", index: "4", data: [14, 39, 23, 10, 171, 164, 142, 131]});
+teacherCollegeHours.push({name: "7 college hours", stack: "default", legendIndex: "6", index: "6", data: [160, 111, 74, 55, 56, 67, 158, 250]});
+teacherCollegeHours.push({name: "1 college hour or less", stack: "default", legendIndex: "0", index: "0", data: [70, 67, 117, 57, 123, 129, 59, 61]});
+teacherCollegeHours.push({name: "11 or more college hours", stack: "default", legendIndex: "10", index: "10", data: [0, 0, 0, 0, 0, 3, 0, 2]});
+teacherCollegeHours.push({name: "4 college hours", stack: "default", legendIndex: "3", index: "3", data: [1756, 1359, 1410, 1151, 1463, 1193, 1361, 941]});
+teacherCollegeHours.push({name: "8 college hours", stack: "default", legendIndex: "7", index: "7", data: [45, 35, 31, 31, 186, 110, 60, 156]});
 $(function() {
 	$(".graphs").append("<div class='timetable-chart' id='teacherCollegeHours'></div>");
 	$('#teacherCollegeHours').highcharts({
